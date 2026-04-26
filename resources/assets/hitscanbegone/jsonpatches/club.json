@@ -1,0 +1,19 @@
+﻿[
+  {
+    "side": "Server",
+    "file": "game:itemtypes/tool/club",
+    "op": "add",
+    "path": "/behaviors/-",
+    "value": {
+      "name": "CollidersLib:ItemCollidersClient",
+      "properties": {
+        "collidersByType": {
+          "*-scrap-*": [{ "Position": ["0.03", "0.025", "0.512"], "Direction": ["1.11", 0, 0], "Radius": "0.13" }],
+          "*": [{ "Position": ["0.11", "0.522", "0.538"], "Direction": ["0.81", 0, 0], "Radius": "0.18" }]
+        }
+      }
+    }
+  },
+  { "side": "Server", "file": "game:itemtypes/tool/club", "op": "add", "path": "/behaviors/-", "value": { "name": "CollidersLib:ItemCollidersServer" } },
+  { "side": "Server", "file": "game:itemtypes/tool/club", "op": "replace", "path": "/behaviors/name=AnimationAuthoritative", "value": { "name": "HitScanBegone:CollidersAuthoritativeBehavior" } }
+]

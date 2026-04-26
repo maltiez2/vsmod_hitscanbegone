@@ -1,0 +1,22 @@
+﻿[
+  {
+    "side": "Server",
+    "file": "game:itemtypes/tool/blade",
+    "op": "add",
+    "path": "/behaviors/-",
+    "value": {
+      "name": "CollidersLib:ItemCollidersClient",
+      "properties": {
+        "collidersByType": {
+          "*-falx-*": [{ "Position": ["0.17", "0.07", "0.5"], "Direction": ["0.93", 0, "-0.02"], "Radius": "0.1" }, { "Position": ["1.02", "0.07", "0.5"], "Direction": ["0.16", 0, "-0.43"], "Radius": "0.1" }],
+          "*-blackguard-*": [{ "Position": ["-0.06", "0.062", "0.5"], "Direction": ["1.22", 0, 0], "Radius": "0.1" }],
+          "*-forlorn-*": [{ "Position": ["-0.13", 0, "0.5"], "Direction": ["1.94", 0, 0], "Radius": "0.1" }],
+          "*-scrap-*": [{ "Position": ["0.19", 0, "0.5"], "Direction": ["1.19", 0, 0], "Radius": "0.1" }],
+          "*": [{ "Position": ["0.04", 0, "0.5"], "Direction": ["2.93", 0, 0], "Radius": "0.1" }]
+        }
+      }
+    }
+  },
+  { "side": "Server", "file": "game:itemtypes/tool/blade", "op": "add", "path": "/behaviors/-", "value": { "name": "CollidersLib:ItemCollidersServer" } },
+  { "side": "Server", "file": "game:itemtypes/tool/blade", "op": "replace", "path": "/behaviors/name=AnimationAuthoritative", "value": { "name": "HitScanBegone:CollidersAuthoritativeBehavior" } }
+]

@@ -1,0 +1,17 @@
+﻿[
+  {
+    "side": "Server",
+    "file": "game:itemtypes/tool/spear",
+    "op": "add",
+    "path": "/behaviors/-",
+    "value": { "name": "CollidersLib:ItemCollidersClient", "properties": { "colliders": [{ "Position": [-1, "0.042", "0.5"], "Direction": ["2.87", 0, 0], "Radius": "0.09" }] } }
+  },
+  { "side": "Server", "file": "game:itemtypes/tool/spear", "op": "add", "path": "/behaviors/-", "value": { "name": "CollidersLib:ItemCollidersServer" } },
+  {
+    "side": "Server",
+    "file": "game:itemtypes/tool/spear",
+    "op": "replace",
+    "path": "/behaviors/name=AnimationAuthoritative",
+    "value": { "nameByType": { "*-hacking": "AnimationAuthoritative", "*": "HitScanBegone:CollidersAuthoritativeBehavior" } }
+  }
+]
