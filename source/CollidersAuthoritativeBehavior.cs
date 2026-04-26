@@ -94,7 +94,7 @@ public class CollidersAuthoritativeBehavior : CollectibleBehaviorAnimationAuthor
         if (ClientColliders != null && byEntity.Api.Side == EnumAppSide.Client && ActiveByPlayer.ContainsKey(byEntity.EntityId) && ActiveByPlayer[byEntity.EntityId])
         {
             List<ColliderItemCollisionData> collisions = ClientColliders.CheckForCollisions(byEntity as EntityPlayer, byEntity.ActiveHandItemSlot);
-            foreach (ColliderItemCollisionData collision in collisions)
+            /*foreach (ColliderItemCollisionData collision in collisions)
             {
                 foreach ((Entity target, CollidersLib.EntityWithCapsuleIntersectionData[] entCols) in collision.EntityCollisions)
                 {
@@ -113,7 +113,7 @@ public class CollidersAuthoritativeBehavior : CollectibleBehaviorAnimationAuthor
                             EnumParticleModel.Cube);
                     }
                 }
-            }
+            }*/
         }
 
         string animationCode = collObj.GetHeldTpHitAnimation(slot, byEntity);
