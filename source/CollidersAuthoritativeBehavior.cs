@@ -1,6 +1,7 @@
 ﻿using CollidersLib.Items;
 using OpenTK.Mathematics;
 using OverhaulLib.Utils;
+using System.Diagnostics;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
@@ -22,6 +23,7 @@ public class CollidersAuthoritativeBehavior : CollectibleBehaviorAnimationAuthor
     public static bool HitOnlyOneEntity { get; set; } = true;
     public static bool StopOnEntityHit { get; set; } = false;
     public int[] CollidersOrder { get; set; } = [0];
+    public float ForcedDurationSeconds { get; set; } = 1;
 
 
     public override void OnLoaded(ICoreAPI api)
@@ -50,23 +52,31 @@ public class CollidersAuthoritativeBehavior : CollectibleBehaviorAnimationAuthor
 
     public override void OnHeldAttackStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, ref EnumHandHandling handHandling, ref EnumHandling handling)
     {
+        if (byEntity is not EntityPlayer player) return;
+        //Debug.WriteLine($"({byEntity.Api.Side}) Start");
         StartAttackColliders(slot, byEntity);
         handling = EnumHandling.PreventSubsequent;
         handHandling = EnumHandHandling.PreventDefault;
-        ClientColliders?.ResetColliders(byEntity as EntityPlayer, slot);
+        ClientColliders?.ResetColliders(player, slot);
     }
 
     public override bool OnHeldAttackStep(float secondsPassed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSelection, EntitySelection entitySel, ref EnumHandling handling)
     {
+        if (byEntity is not EntityPlayer player) return false;
         handling = EnumHandling.PreventSubsequent;
-        return StepAttackColliders(slot, byEntity);
+        bool result = StepAttackColliders(slot, player, secondsPassed);
+        //Debug.WriteLine($"({byEntity.Api.Side}) Step: {result}");
+        return result;
     }
 
     public override bool OnHeldAttackCancel(float secondsPassed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSelection, EntitySelection entitySel, EnumItemUseCancelReason cancelReason, ref EnumHandling handling)
     {
+        //Debug.WriteLine($"({byEntity.Api.Side}) Cancel");
         handling = EnumHandling.PreventSubsequent;
         return false;
     }
+
+
 
     public virtual void StartAttackColliders(ItemSlot slot, EntityAgent byEntity)
     {
@@ -89,32 +99,14 @@ public class CollidersAuthoritativeBehavior : CollectibleBehaviorAnimationAuthor
         });
     }
 
-    public virtual bool StepAttackColliders(ItemSlot slot, EntityAgent byEntity)
+    public virtual bool StepAttackColliders(ItemSlot slot, EntityPlayer byEntity, float secondsPassed)
     {
         if (ClientColliders != null && byEntity.Api.Side == EnumAppSide.Client && ActiveByPlayer.ContainsKey(byEntity.EntityId) && ActiveByPlayer[byEntity.EntityId])
         {
-            List<ColliderItemCollisionData> collisions = ClientColliders.CheckForCollisions(byEntity as EntityPlayer, byEntity.ActiveHandItemSlot);
-            /*foreach (ColliderItemCollisionData collision in collisions)
-            {
-                foreach ((Entity target, CollidersLib.EntityWithCapsuleIntersectionData[] entCols) in collision.EntityCollisions)
-                {
-                    foreach (CollidersLib.EntityWithCapsuleIntersectionData entCol in entCols)
-                    {
-                        byEntity.Api.World.SpawnParticles(
-                            1,
-                            ColorUtil.ToRgba(255, 255, 255, 255),
-                            entCol.IntersectionPoint.ToVanillaRef(),
-                            entCol.IntersectionPoint.ToVanillaRef(),
-                            new(),
-                            new(),
-                            1,
-                            0,
-                            1,
-                            EnumParticleModel.Cube);
-                    }
-                }
-            }*/
+            _ = ClientColliders.CheckForCollisions(byEntity, byEntity.ActiveHandItemSlot);
         }
+
+        if (secondsPassed < ForcedDurationSeconds) return true;
 
         string animationCode = collObj.GetHeldTpHitAnimation(slot, byEntity);
         bool result = byEntity.AnimManager.IsAnimationActive(animationCode);
@@ -122,7 +114,7 @@ public class CollidersAuthoritativeBehavior : CollectibleBehaviorAnimationAuthor
         {
             ActiveByPlayer[byEntity.EntityId] = false;
         }
-        return result;
+        return result || byEntity.Api.Side == EnumAppSide.Server;
     }
 
     public virtual void HitEntity(EntityAgent byEntity)
@@ -178,10 +170,8 @@ public class CollidersAuthoritativeBehavior : CollectibleBehaviorAnimationAuthor
     }
     protected virtual void OnCollisionDetected(EntityPlayer byEntity, ItemSlot inSlot, List<ColliderItemCollisionData> collisions)
     {
-        List<SingleItemCollisionData> sorted = ClientColliders.SortCollisions(byEntity, collisions, [0, 1]);
+        List<SingleItemCollisionData> sorted = ClientColliders?.SortCollisions(byEntity, collisions, [0, 1]) ?? [];
         List<SingleItemCollisionData> validatedCollisions = ValidateCollisions(sorted);
-
-        //Debug.WriteLine($"OnCollisionDetected: {sorted.Count} -> {validatedCollisions.Count}");
 
         if (validatedCollisions.Count == 0) return;
 
@@ -202,8 +192,6 @@ public class CollidersAuthoritativeBehavior : CollectibleBehaviorAnimationAuthor
 
         foreach (SingleItemCollisionData collision in collisionsSorted)
         {
-            //Debug.WriteLine($"Entity col: {collision.Target != null}, collider: {collision.ColliderIndex}, priority: {collision.Priority}, subdivision: {collision.Subdivision}, distance: {collision.DistanceFromTail}");
-
             if (collision.EntityCollision != null && collision.BehindTerrain)
             {
                 continue;
