@@ -53,7 +53,6 @@ public class CollidersAuthoritativeBehavior : CollectibleBehaviorAnimationAuthor
     public override void OnHeldAttackStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, ref EnumHandHandling handHandling, ref EnumHandling handling)
     {
         if (byEntity is not EntityPlayer player) return;
-        //Debug.WriteLine($"({byEntity.Api.Side}) Start");
         StartAttackColliders(slot, byEntity);
         handling = EnumHandling.PreventSubsequent;
         handHandling = EnumHandHandling.PreventDefault;
@@ -65,13 +64,11 @@ public class CollidersAuthoritativeBehavior : CollectibleBehaviorAnimationAuthor
         if (byEntity is not EntityPlayer player) return false;
         handling = EnumHandling.PreventSubsequent;
         bool result = StepAttackColliders(slot, player, secondsPassed);
-        //Debug.WriteLine($"({byEntity.Api.Side}) Step: {result}");
         return result;
     }
 
     public override bool OnHeldAttackCancel(float secondsPassed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSelection, EntitySelection entitySel, EnumItemUseCancelReason cancelReason, ref EnumHandling handling)
     {
-        //Debug.WriteLine($"({byEntity.Api.Side}) Cancel");
         handling = EnumHandling.PreventSubsequent;
         return false;
     }
